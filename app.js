@@ -1,9 +1,9 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-// const session = require('express-session');
-// const cookieParser = require('cookie-parser');
-// const cors = require('cors');
-// require('dotenv').config();
+const session = require('express-session');
+const cookieParser = require('cookie-parser');
+const cors = require('cors');
+require('dotenv').config();
 const path = require('path');
 
 
@@ -21,8 +21,25 @@ app.get('/login', (req, res) => {
 
 
 app.use(bodyParser.json());
-// app.use(cors());
-// app.use(cookieParser())
+app.use(cors());
+app.use(cookieParser())
+
+
+
+app.use(session({
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: false,
+    cookie: { secure: false, maxAge: 60 * 60 * 1000} // Use secure: true if using HTTPS
+  }));
+
+const authRouter = require('./src/routes/authRoute');
+// const orgRouter = require('./src/routes/orgRoute');
+
+// Use routers with specific paths
+app.use('/auth', authRouter);
+// app.use('/api', orgRouter);
+
 
 
 app.listen(3000, () => {
