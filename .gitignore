@@ -2,3 +2,4 @@
 .env.orig
 node_modules
 .orig
+.DS_Store
