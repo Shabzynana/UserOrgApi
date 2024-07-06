@@ -17,11 +17,8 @@ router.post("/auth/register", userValidationRules(), validate, register);
 
 router.post("/auth/login", login);
 
-router.get("/api/users/:id", getUser);
+router.get("/api/users/:id", authenticateToken, getUser);
 
-router.get('/auth/protected', authenticateToken, (req, res) => {
-  res.json({ message: 'This is a protected endpoint', user: req.user });
-});
 
 
 
