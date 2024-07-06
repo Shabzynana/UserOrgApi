@@ -40,7 +40,7 @@ async function register(req, res, next)  {
             select: { userId: true, firstName: true, lastName: true, email: true, phone: true } // Adjust the selected fields as needed
         })
 
-        const token = signToken({ id: user.userId}, JWT_SECRET, '10m');
+        const token = signToken({ id: newUser.userId}, JWT_SECRET, '10m');
 
         try {   
           res.status(201).json({
@@ -49,21 +49,22 @@ async function register(req, res, next)  {
             "data": {
               "accessToken": token,
               "user": {
-                userId: user.userId,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                email: user.email,
-                phone: user.phone,
+                userId: newUser.userId,
+                firstName: newUser.firstName,
+                lastName: newUser.lastName,
+                email: newUser.email,
+                phone: newUser.phone,
               },       
             }
         })
           console.log(newUser.email,  'register')
         } catch (error) {
-          res.status(400).json({
-            "status": "Bad request",
-            "message": "Registration unsuccessful",
-            "statusCode": 400
-          })
+          next(error)
+          // res.status(400).json({
+          //   "status": "Bad request",
+          //   "message": "Registration unsuccessful",
+          //   "statusCode": 400
+          // })
         }
     } catch (error) {
         next(error)
