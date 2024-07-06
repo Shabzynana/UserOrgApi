@@ -101,12 +101,12 @@ async function login (req, res, next) {
       } 
     } catch (error) {
 
-      // next(error)
-      res.status(401).json({
-        "status": "Bad request",
-        "message": "Authentication failed",
-        "statusCode": 401
-      })
+      next(error)
+      // res.status(401).json({
+      //   "status": "Bad request",
+      //   "message": "Authentication failed",
+      //   "statusCode": 401
+      // })
       
     
     }
