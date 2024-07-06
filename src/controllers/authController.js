@@ -79,7 +79,8 @@ async function login (req, res, next) {
       const user = await prisma.user.findUnique({
         where: { email },
       });
-      if (user && comparePassword(String(password), (user.password))) {
+      console.log(password, user.password)
+      if (user && comparePassword((password), (user.password))) {
 
         const token = signToken({ id: user.userId}, JWT_SECRET, '10m');
 
@@ -98,17 +99,15 @@ async function login (req, res, next) {
           },
         });
        console.log(user.email, 'login')
-      } 
+      }  else {
+        res.status(401).json({
+        "status": "Bad request",
+        "message": "Authentication failed",
+        "statusCode": 401
+      })
+      }
     } catch (error) {
-
       next(error)
-      // res.status(401).json({
-      //   "status": "Bad request",
-      //   "message": "Authentication failed",
-      //   "statusCode": 401
-      // })
-      
-    
     }
 }; 
 
