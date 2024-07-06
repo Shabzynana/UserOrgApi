@@ -3,7 +3,7 @@
 const { prisma } = require('../../prisma/client');
 // const { authMiddleware } = require('../middlewares/authMiddleware');
 const { hashPassword, comparePassword } = require('../services/authService');
-// const { signToken, validateToken, JWT_SECRET, RESET_TOKEN_SECRET, EMAIL_TOKEN_SECRET } = require('../services/tokenService');
+const { signToken, validateToken, JWT_SECRET, RESET_TOKEN_SECRET, EMAIL_TOKEN_SECRET } = require('../services/tokenService');
 
 
  
@@ -73,59 +73,76 @@ async function login (req, res, next) {
     const { email, password } = req.body;
     try {
       const user = await prisma.user.findUnique({
-        where: { email }
+        where: { email },
+        select: { userId: true, firstName: true, lastName: true, email: true, phone: true } // Adjust the selected fields as needed
       });
       if (!user) {
         res.json({"error": "Email is Invalid!"})
       }
-      // if (user && (user.password)) {
-      if (user && comparePassword(password, user.password)) {
-        req.session.user = { id: user.id, 
-                             username: user.username };
-        res.send({"msg" : "Login successful"});
-      } 
-        // else if (user || (!user.password)) {
-        else if (user || (!comparePassword(password, user.password))) {
+
+      console.log(password, 1)
+      console.log(user.firstName, 2)
+      console.log(user.password, 2)
+
+      if (user && comparePassword(String(password), (user.password))) {
+
+        const token = signToken({ id: user.userId}, JWT_SECRET, '10m');
+
+        res.json({
+          status: 'success',
+          message: 'Login successful',
+          data: {
+            accessToken: token,
+            user: user
+          },
+        });
+
+      } else if (user || (!comparePassword(password, user.password))) {
         res.json({"error": "Password is Incorrect!"})
       } else  {
         res.status(401).send('Invalid username or password');
       }
     } catch (error) {
-        next(error)
-    //   res.status(500).send('Error logging in');
+
+      next(error)
+
+      // res.status(401).json({
+      //   "status": "Bad request",
+      //   "message": "Authentication failed",
+      //   "statusCode": 401
+      // })
+      
+    
     }
-  }; 
+}; 
 
 
-// Logout route
-async function logout (req, res) {
-    req.session.destroy(err => {
-        if (err) {
-        return res.status(500).send({"error": "Failed to logout"});
-        }
-        res.clearCookie('connect.sid');
-        res.json('Logout successful');
-    });
-};  
-
-
-// Route to get current logged-in user
-async function current_user (req, res) { 
-    const userId = req.session.user.id;
-    try {
+// GET A SER DETAILS
+async function getUser(req, res, next) {
+  try {
+      const {id} = req.params
       const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: { id: true, username: true } // Adjust the selected fields as needed
+          where: { userId: (id) },
+          select: { userId: true, firstName: true, lastName: true, email: true, phone: true } 
       });
       if (user) {
-        res.json(user);
-      } else {
-        res.status(404).send('User not found');
+          res.status(200).json({
+            "status": "success",
+            "message": "User Details",
+            "data": user
+        });
       }
-    } catch (error) {
-      res.status(500).send('Error fetching user data');
-    }
-  };
+      else {
+          res.json({ error: 'User not found.'});
+      }
+  } catch (error) {
+      next(error) 
+      }
+};
+
+
+
+
 
 
 
@@ -141,6 +158,6 @@ module.exports = {
   authhome,
   register,
   login,
-  logout,
-  current_user,
+  getUser
+
   };

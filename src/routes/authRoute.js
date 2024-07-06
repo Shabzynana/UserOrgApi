@@ -4,23 +4,24 @@ const router = require('express').Router();
 const { authhome, 
     register,
     login,
-    logout,
-    current_user,
+    getUser,
   } = require('../controllers/authController');
 
-// const { authMiddleware } = require('../middlewares/authMiddleware');
+const { authenticateToken } = require('../middlewares/authMiddleware');
 const { userValidationRules, validate } = require('../utils/error');
 
 
-router.get("/authhome", authhome);
+router.get("/auth/authhome", authhome);
 
-router.post("/register", userValidationRules(), validate, register);
+router.post("/auth/register", userValidationRules(), validate, register);
 
-router.post("/login", login);
+router.post("/auth/login", login);
 
-router.post("/logout", logout);
+router.get("/api/users/:id", getUser);
 
-// router.get("/current_user", authMiddleware, current_user);
+router.get('/auth/protected', authenticateToken, (req, res) => {
+  res.json({ message: 'This is a protected endpoint', user: req.user });
+});
 
 
 

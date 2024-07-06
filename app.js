@@ -23,6 +23,8 @@ app.get('/login', (req, res) => {
 app.use(bodyParser.json());
 app.use(cors());
 app.use(cookieParser())
+app.use(express.json());
+
 
 
 
@@ -34,11 +36,11 @@ app.use(session({
   }));
 
 const authRouter = require('./src/routes/authRoute');
-// const orgRouter = require('./src/routes/orgRoute');
+const orgRouter = require('./src/routes/orgRoute');
 
 // Use routers with specific paths
-app.use('/auth', authRouter);
-// app.use('/api', orgRouter);
+app.use('', authRouter);
+app.use('', orgRouter);
 
 
 

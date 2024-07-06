@@ -4,15 +4,6 @@ const jwt = require('jsonwebtoken');
 const JWT_SECRET = process.env.JWT_SECRET;
 
 
-// login required
-function authMiddleware(req, res, next) {
-    if (req.session.user) {
-      next();
-    } else {
-      res.status(401).send('You need to log in first');
-    }
-}  
-
 // protect route
 const authenticateToken = (req, res, next) => {
   const authHeader = req.header('Authorization');
@@ -28,5 +19,5 @@ const authenticateToken = (req, res, next) => {
   }
 };
 
-module.exports = { authMiddleware, ConfirmedUserMiddleware};
+module.exports = { authenticateToken};
 
