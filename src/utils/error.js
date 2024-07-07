@@ -14,15 +14,32 @@ const userValidationRules = () => {
           }
           return true;
         }),
+      body('userId').custom(async (userId) => {
+        const existingUserId = await prisma.user.findUnique({ where: { userId } });
+        if (existingUserId) {
+          throw new Error('UserId already exist!');
+        }
+        return true;
+      }),
       body('firstName').notEmpty().withMessage('First name cannot be empty')
         .isLength({ max: 64 }).withMessage('Must be at most 64 characters long'),
       body('lastName').notEmpty().withMessage('Last name cannot be empty')
         .isLength({ max: 64 }).withMessage('Must be at most 64 characters long'),
       body('password').notEmpty().withMessage('Password cannot be empty')
         .isLength({ max: 64 }).withMessage('Must be at most 64 characters long'),
-      body('phone').optional().isLength({ max: 15 }).withMessage('Must be at most 15 characters long'),
+      body('phone').notEmpty().withMessage('Phone cannot be empty')
+        .isLength({ max: 20 }).withMessage('Must be at most 20 characters long'),
+
     ];
   };
+
+  const organisationValidationRules = () => {
+    return [
+      body('name').notEmpty().withMessage('Name cannot be empty')
+        .isLength({ max: 128 }).withMessage('Must be at most 128 characters long'),
+      body('description').optional().isLength({ max: 256 }).withMessage('Must be at most 256 characters long'),
+    ];
+  };  
 
 
 
@@ -42,5 +59,5 @@ const validate = (req, res, next) => {
 
 
 module.exports = {
-  userValidationRules, validate,
+  userValidationRules, organisationValidationRules,validate,
 }

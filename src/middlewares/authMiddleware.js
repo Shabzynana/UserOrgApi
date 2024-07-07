@@ -10,13 +10,25 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader && authHeader.split(' ')[1];
   if (!token) return res.status(401).json({ message: 'Access denied' });
 
-  try {
-    const verified = jwt.verify(token, JWT_SECRET);
-    req.user = verified;
+
+  jwt.verify(token, JWT_SECRET, (err, user) => {
+    if (err) {
+      if (err.name === 'TokenExpiredError') {
+        return res.status(401).json({ message: 'Token expired' });
+      }
+      return res.status(400).json({ message: 'Invalid token' });
+    }
+    req.user = user;
     next();
-  } catch (err) {
-    res.status(400).json({ message: 'Invalid token' });
-  }
+  });
+
+  // try {
+  //   const verified = jwt.verify(token, JWT_SECRET);
+  //   req.user = verified;
+  //   next();
+  // } catch (err) {
+  //   res.status(400).json({ message: 'Invalid token' });
+  // }
 };
 
 module.exports = { authenticateToken};

@@ -14,11 +14,11 @@ async function getallOrg(req, res, next)  {
         },
       });
   
-      res.json({
+      res.status(200).json({
         status: 'success',
         message: 'Organisations retrieved successfully',
         data: {
-            'orrganisations': [organisations]
+            'orrganisations': organisations
         },
       });
     } catch (error) {
@@ -33,19 +33,35 @@ async function getAOrg(req, res, next)  {
         const {orgId} = req.params
         const organisation = await prisma.organisation.findUnique({
             where: { orgId :(orgId) },
-          
+            include: {
+                users: true
+            }
         });
+
         if (!organisation) {
-            res.status(404).json({ error: 'Organisation not found' });
-        } else {
-          res.json({
+          res.status(404).json({ error: 'Organisation not found' });
+        }
+        
+        console.log(organisation.users)
+        const isUserInOrg = organisation.users.some(user => user.user_Id === req.user.id);
+        console.log(isUserInOrg)
+
+        if (!isUserInOrg) {
+          return res.status(403).json({ message: 'Access denied' });
+        }
+         else {
+          res.status(200).json({
             status: 'success',
             message: 'Organisation retrieved successfully',
-            data: organisation    
+            data: {
+              "orgId": organisation.orgId,
+              "name": organisation.name,
+              "description": organisation.description, }   
         });
         }
         
         } catch (error) {
+          // next(error)
           res.status(500).json({ error: 'Internal Server Error' });
         }
 };

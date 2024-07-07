@@ -40,7 +40,7 @@ async function register(req, res, next)  {
             select: { userId: true, firstName: true, lastName: true, email: true, phone: true } // Adjust the selected fields as needed
         })
 
-        const token = signToken({ id: newUser.userId}, JWT_SECRET, '10m');
+        const token = signToken({ id: newUser.userId}, JWT_SECRET, '30m');
 
         try {   
           res.status(201).json({
@@ -59,12 +59,12 @@ async function register(req, res, next)  {
         })
           console.log(newUser.email,  'register')
         } catch (error) {
-          next(error)
-          // res.status(400).json({
-          //   "status": "Bad request",
-          //   "message": "Registration unsuccessful",
-          //   "statusCode": 400
-          // })
+          // next(error)
+          res.status(400).json({
+            "status": "Bad request",
+            "message": "Registration unsuccessful",
+            "statusCode": 400
+          })
         }
     } catch (error) {
         next(error)
@@ -82,9 +82,9 @@ async function login (req, res, next) {
       console.log(password, user.password)
       if (user && comparePassword((password), (user.password))) {
 
-        const token = signToken({ id: user.userId}, JWT_SECRET, '10m');
+        const token = signToken({ id: user.userId}, JWT_SECRET, '1h');
 
-        res.json({
+        res.status(200).json({
           status: 'success',
           message: 'Login successful',
           data: {
@@ -128,7 +128,7 @@ async function getUser(req, res, next) {
         });
       }
       else {
-          res.json({ error: 'User not found.'});
+          res.json({ message: 'User not found.'});
       }
   } catch (error) {
       next(error) 
