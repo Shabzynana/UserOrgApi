@@ -27,8 +27,8 @@ const userValidationRules = () => {
         .isLength({ max: 64 }).withMessage('Must be at most 64 characters long'),
       body('password').notEmpty().withMessage('Password cannot be empty')
         .isLength({ max: 64 }).withMessage('Must be at most 64 characters long'),
-      body('phone').notEmpty().withMessage('Phone cannot be empty')
-        .isLength({ max: 20 }).withMessage('Must be at most 20 characters long'),
+      body('phone').optional().isLength({ max: 20 }).withMessage('Must be at most 20 characters long'),
+        
 
     ];
   };

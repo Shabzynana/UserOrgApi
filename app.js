@@ -19,7 +19,7 @@ const app = express();
 //     res.render('login');
 // });
 
-
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 app.use(cors());
 // app.use(cookieParser())
@@ -27,8 +27,13 @@ app.use(express.json());
 
 
 
-const authRouter = require('./src/routes/authRoute');
+
+
+
+
+
 const orgRouter = require('./src/routes/orgRoute');
+const authRouter = require('./src/routes/authRoute');
 
 // Use routers with specific paths
 app.use('', authRouter);
@@ -36,6 +41,15 @@ app.use('', orgRouter);
 
 
 
-app.listen(3000, () => {
-    console.log('app is running on port 3000');
-});
+// app.listen(3000, () => {
+//     console.log('app is running on port 3000');
+// });
+
+// module.exports = app;
+
+const server = app.listen(3000, () => {
+    console.log('App is listening on port 3000');
+  });
+  
+  
+  module.exports = { app, server };

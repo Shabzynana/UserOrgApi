@@ -40,7 +40,7 @@ async function register(req, res, next)  {
             select: { userId: true, firstName: true, lastName: true, email: true, phone: true } // Adjust the selected fields as needed
         })
 
-        const token = signToken({ id: newUser.userId}, JWT_SECRET, '30m');
+        const token = signToken({ email: newUser.email}, JWT_SECRET, '30m');
 
         try {   
           res.status(201).json({
@@ -59,7 +59,7 @@ async function register(req, res, next)  {
         })
           console.log(newUser.email,  'register')
         } catch (error) {
-          // next(error)
+          next(error)
           res.status(400).json({
             "status": "Bad request",
             "message": "Registration unsuccessful",
@@ -69,6 +69,7 @@ async function register(req, res, next)  {
     } catch (error) {
         next(error)
     }
+
 };
 
 
@@ -82,7 +83,7 @@ async function login (req, res, next) {
       console.log(password, user.password)
       if (user && comparePassword((password), (user.password))) {
 
-        const token = signToken({ id: user.userId}, JWT_SECRET, '1h');
+        const token = signToken({ email: user.email}, JWT_SECRET, '1h');
 
         res.status(200).json({
           status: 'success',
@@ -106,6 +107,7 @@ async function login (req, res, next) {
         "statusCode": 401
       })
       }
+   
     } catch (error) {
       next(error)
     }
@@ -113,26 +115,81 @@ async function login (req, res, next) {
 
 
 // GET A uSER DETAILS
+// async function getUser(req, res, next) {
+//   try {
+//       const {id} = req.params
+//       const user = await prisma.user.findUnique({
+//           where: { userId: (id) },
+//           select: { userId: true, firstName: true, lastName: true, email: true, phone: true } 
+//       });
+//       if (user) {
+//           res.status(200).json({
+//             "status": "success",
+//             "message": "User Details",
+//             "data": user
+//         });
+//       }
+//       else {
+//           res.json({ message: 'User not found.'});
+//       }
+//   } catch (error) {
+//       next(error) 
+//       }
+// };
+
 async function getUser(req, res, next) {
+  const { id } = req.params;
+  const currentUserId = req.user.id;
+
   try {
-      const {id} = req.params
-      const user = await prisma.user.findUnique({
-          where: { userId: (id) },
-          select: { userId: true, firstName: true, lastName: true, email: true, phone: true } 
-      });
-      if (user) {
-          res.status(200).json({
-            "status": "success",
-            "message": "User Details",
-            "data": user
-        });
-      }
-      else {
-          res.json({ message: 'User not found.'});
-      }
+    // Fetch the current logged-in user's organizations
+    const currentUserOrgs = await prisma.orgUser.findMany({
+      where: { user_Id: currentUserId },
+      include: { org: true },
+    });
+
+    // Get a list of organization IDs the current user belongs to
+    const currentUserOrgIds = currentUserOrgs.map(orgUser => orgUser.org_Id);
+
+    // Fetch the requested user and related organizations
+    const user = await prisma.user.findUnique({
+      where: { userId: id },
+      include: {
+        orgs: {
+          include: {
+            org: true,
+          },
+        },
+      },
+    });
+
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Check if the requested user belongs to any of the current user's organizations
+    const isSameOrg = user.orgs.some(orgUser => currentUserOrgIds.includes(orgUser.org_Id));
+
+    if (id !== currentUserId && !isSameOrg) {
+      return res.status(403).json({ error: 'Access forbidden: not in the same organization' });
+    }
+    res.status(200).json({
+      "status": "success",
+      "message": "User Details",
+      "data":  {
+        userId: user.userId,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        email: user.email,
+        phone: user.phone,
+      },
+    });
+
+
   } catch (error) {
-      next(error) 
-      }
+    console.error(error);
+    res.status(500).json({ error: 'An error occurred while fetching the user data' });
+  }
 };
 
 

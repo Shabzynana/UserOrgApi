@@ -4,8 +4,9 @@
   "main": "index.js",
   "scripts": {
     "postinstall": "prisma generate",
-    "start": "nodemon app.js"
-    
+    "start": "nodemon app.js",
+    "test": "jest"
+
   },
   "keywords": [],
   "author": "",
@@ -25,7 +26,10 @@
     "jsonwebtoken": "^9.0.2"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
+    "jest-mock-extended": "^3.0.7",
     "nodemon": "^3.1.4",
-    "prisma": "^5.16.1"
+    "prisma": "^5.16.1",
+    "supertest": "^7.0.0"
   }
 }
