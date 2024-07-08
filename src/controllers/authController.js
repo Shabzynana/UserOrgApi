@@ -73,7 +73,7 @@ async function register(req, res, next)  {
         })
           console.log(newUser.email,  'register')
         } catch (error) {
-          next(error)
+          // next(error)
           res.status(400).json({
             "status": "Bad request",
             "message": "Registration unsuccessful",

@@ -62,7 +62,7 @@ async function getAOrg(req, res, next)  {
         
         } catch (error) {
           // next(error)
-          res.status(500).json({ error: 'Internal Server Error' });
+          res.status(500).json({ 'error': 'You are not doing something right' });
         }
 };
 
@@ -136,7 +136,7 @@ async function addUserToOrg(req, res, next)  {
       });
     } catch (error) {
       // next(error)
-      res.status(500).json({ error: 'Internal server error' });
+      res.status(500).json({'error': 'You are not doing something right' });
     }
   };
 
