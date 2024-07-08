@@ -14,13 +14,13 @@ const userValidationRules = () => {
           }
           return true;
         }),
-      body('userId').custom(async (userId) => {
-        const existingUserId = await prisma.user.findUnique({ where: { userId } });
-        if (existingUserId) {
-          throw new Error('UserId already exist!');
-        }
-        return true;
-      }),
+      // body('userId').custom(async (userId) => {
+      //   const existingUserId = await prisma.user.findUnique({ where: { userId } });
+      //   if (existingUserId) {
+      //     throw new Error('UserId already exist!');
+      //   }
+      //   return true;
+      // }),
       body('firstName').notEmpty().withMessage('First name cannot be empty')
         .isLength({ max: 64 }).withMessage('Must be at most 64 characters long'),
       body('lastName').notEmpty().withMessage('Last name cannot be empty')

@@ -1,4 +1,7 @@
 // routes/users.js
+// const jwt = require("jsonwebtoken");
+// const bcrypt = require('bcrypt');
+
 
 const { prisma } = require('../../prisma/client');
 const { hashPassword, comparePassword } = require('../services/authService');
@@ -17,6 +20,14 @@ async function register(req, res, next)  {
     const { email, firstName, lastName, password, phone } = req.body;
     const orgsname = firstName + "'s" + ' Organiztaion';
 
+    // console.log(await prismaClient(), 'prisma')
+
+    // console.log(await prisma.user.findMany(), 'all users')
+
+    console.log(email,firstName,lastName, password, phone, 'email-instance')
+
+    // const hashedPassword = await bcrypt.hash(password, 10);
+
     try {
         const newUser =  await prisma.user.create({
             data : {
@@ -24,24 +35,27 @@ async function register(req, res, next)  {
                 firstName,
                 lastName,
                 phone,
+                // password: hashedPassword,
                 password: hashPassword(password),
 
+
                 orgs : {
-                  create: [ {
+                  create:  {
                     org: {
                       create: {
                         name: orgsname,
                       },
                     },
-                  }]                  
+                  }                 
                 },
             },
             
             select: { userId: true, firstName: true, lastName: true, email: true, phone: true } // Adjust the selected fields as needed
         })
+        console.log(newUser, 'instance')
 
-        const token = signToken({ email: newUser.email}, JWT_SECRET, '30m');
-
+        const token = signToken({ email: newUser.email}, JWT_SECRET, '1h');
+  
         try {   
           res.status(201).json({
             "status": "success",
@@ -67,7 +81,10 @@ async function register(req, res, next)  {
           })
         }
     } catch (error) {
-        next(error)
+      next(error)
+      console.log('An error occurred:', error.message);
+
+      // console.log(error, 'error')
     }
 
 };
@@ -80,6 +97,7 @@ async function login (req, res, next) {
       const user = await prisma.user.findUnique({
         where: { email },
       });
+      console.log(user)
       console.log(password, user.password)
       if (user && comparePassword((password), (user.password))) {
 
