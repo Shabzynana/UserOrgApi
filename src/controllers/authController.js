@@ -54,7 +54,7 @@ async function register(req, res, next)  {
         })
         console.log(newUser, 'instance')
 
-        const token = signToken({ email: newUser.email}, JWT_SECRET, '1h');
+        const token = signToken({ id: newUser.userId}, JWT_SECRET, '1h');
   
         try {   
           res.status(201).json({
@@ -101,7 +101,7 @@ async function login (req, res, next) {
       console.log(password, user.password)
       if (user && comparePassword((password), (user.password))) {
 
-        const token = signToken({ email: user.email}, JWT_SECRET, '1h');
+        const token = signToken({ id: user.userId}, JWT_SECRET, '1h');
 
         res.status(200).json({
           status: 'success',
