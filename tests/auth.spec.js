@@ -6,15 +6,6 @@ const { app, server } = require('../app');
 
 const { prisma } = require('../prisma/client');
 
-
-// const { prisma } = require('../singleton')
-
-
-
-// const JWT_SECRET = 'your_jwt_secret'; // Use the same secret key used in your app
-
-// module.exports = { app, prisma };
-
 const port = 5001;
 let servertest;
 
@@ -154,19 +145,19 @@ describe("Organisation Access Unit Test", () => {
     });
 
 
-  //   // console.log(registerResponse)
-  //   // console.log( expect(registerResponse.body.data.accessToken).toBeDefined() ) 
-  //   const token = registerResponse.body.data.accessToken;
-  //   console.log(token)
-  //   const decoded = jwt.verify(token, process.env.JWT_SECRET);
-  //   let jwtExpiry;
-  //   if (process.env.JWT_EXPIRY === "1d") {
-  //     jwtExpiry = 86400;
-  //   }
+    // console.log(registerResponse)
+    // console.log( expect(registerResponse.body.data.accessToken).toBeDefined() ) 
+    const token = registerResponse.body.data.accessToken;
+    console.log(token)
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    let jwtExpiry;
+    if (process.env.JWT_EXPIRY === "1d") {
+      jwtExpiry = 86400;
+    }
 
-  //   expect(decoded.exp).toBeDefined();
-  //   expect(decoded.exp - decoded.iat).toBe(jwtExpiry);
-  // }, 60000);
+    expect(decoded.exp).toBeDefined();
+    expect(decoded.exp - decoded.iat).toBe(jwtExpiry);
+  }, 60000);
 
   it("should contain the correct user details in the token", async () => {
     const loginResponse = await request(app).post("/auth/login").send({
@@ -216,6 +207,7 @@ describe("Organisation Access Unit Test", () => {
     expect(response.body.status).toBe("error");
     expect(response.body.message).toBe("Access denied");
   }, 60000);
+  
 });
 
 describe("End to End tests", () => {
