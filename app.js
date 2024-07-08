@@ -40,29 +40,29 @@ app.listen(3000, () => {
     console.log('app is running on port 3000');
 });
 
-module.exports = app;
+// module.exports = app;
 
 // const server = app.listen(3000, () => {
 //     console.log('App is listening on port 3000');
 //   });
 
-// const server = (port) => {
-//   const serverPort = port || process.env.PORT || 3000;
-//   return new Promise((resolve, reject) => {
-//     const server = app
-//       .listen(serverPort, () => {
-//         console.log(`Server is running on PORT ${serverPort}`);
-//         resolve(server);
-//       })
-//       .on("error", reject);
-//   });
-// };
+const server = (port) => {
+  const serverPort = port || process.env.PORT || 3000;
+  return new Promise((resolve, reject) => {
+    const server = app
+      .listen(serverPort, () => {
+        console.log(`Server is running on PORT ${serverPort}`);
+        resolve(server);
+      })
+      .on("error", reject);
+  });
+};
 
-// if (process.env.NODE_ENV !== 'test') {
-//   server().catch(err => {
-//     console.error('Failed to start server:', err);
-//     process.exit(1);
-//   });
-// }
+if (process.env.NODE_ENV !== 'test') {
+  server().catch(err => {
+    console.error('Failed to start server:', err);
+    process.exit(1);
+  });
+}
   
-// module.exports ={app, sever};
+module.exports ={app, server};

@@ -114,17 +114,17 @@ describe("Token Generation Unit Test", () => {
   //   expect(decoded.exp - decoded.iat).toBe(jwtExpiry);
   // }, 60000);
 
-  // it("should contain the correct user details in the token", async () => {
-  //   const loginResponse = await request(app).post("/auth/login").send({
-  //     email: "testuser@example.com",
-  //     password: "password123",
-  //   });
+  it("should contain the correct user details in the token", async () => {
+    const loginResponse = await request(app).post("/auth/login").send({
+      email: "testuser@example.com",
+      password: "password123",
+    });
 
-  //   const token = loginResponse.body.data.accessToken;
-  //   const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const token = loginResponse.body.data.accessToken;
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
-  //   expect(decoded.email).toBe("testuser@example.com");
-  // }, 60000);
+    expect(decoded.email).toBe("testuser@example.com");
+  }, 60000);
 });
 
 // describe("Organisation Access Unit Test", () => {
