@@ -19,74 +19,40 @@ async function authhome(req, res) {
 async function register(req, res, next)  {
     const { email, firstName, lastName, password, phone } = req.body;
     const orgsname = firstName + "'s" + ' Organiztaion';
-
-    // console.log(await prismaClient(), 'prisma')
-
-    // console.log(await prisma.user.findMany(), 'all users')
-
-    console.log(email,firstName,lastName, password, phone, 'email-instance')
-
-    // const hashedPassword = await bcrypt.hash(password, 10);
-
+    const hashedPassword = hashPassword(password, 10);
     try {
-        const newUser =  await prisma.user.create({
-            data : {
-                email,
-                firstName,
-                lastName,
-                phone,
-                // password: hashedPassword,
-                password: hashPassword(password),
+      const newUser =  await prisma.user.create({
+        data : { 
+          email, firstName,lastName,
+          phone, password: hashedPassword,
+          orgs : { create: {org: { create: {name: orgsname }}}},
+        },
+        select: { userId: true, firstName: true, lastName: true, email: true, phone: true }
+      });
 
+      const token = signToken({ id: newUser.userId}, JWT_SECRET, '1h');
 
-                orgs : {
-                  create:  {
-                    org: {
-                      create: {
-                        name: orgsname,
-                      },
-                    },
-                  }                 
-                },
-            },
-            
-            select: { userId: true, firstName: true, lastName: true, email: true, phone: true } // Adjust the selected fields as needed
-        })
-        console.log(newUser, 'instance')
-
-        const token = signToken({ id: newUser.userId}, JWT_SECRET, '1h');
-  
-        try {   
-          res.status(201).json({
-            "status": "success",
-            "message": "Registration successful",
-            "data": {
-              "accessToken": token,
-              "user": {
-                userId: newUser.userId,
-                firstName: newUser.firstName,
-                lastName: newUser.lastName,
-                email: newUser.email,
-                phone: newUser.phone,
-              },       
-            }
-        })
-          console.log(newUser.email,  'register')
-        } catch (error) {
-          // next(error)
-          res.status(400).json({
-            "status": "Bad request",
-            "message": "Registration unsuccessful",
-            "statusCode": 400
-          })
-        }
-    } catch (error) {
-      next(error)
-      console.log('An error occurred:', error.message);
-
-      // console.log(error, 'error')
+        return res.status(201).json({
+          "status": "success",
+          "message": "Registration successful",
+          "data": {
+            "accessToken": token,
+            "user": {
+              userId: newUser.userId,
+              firstName: newUser.firstName,
+              lastName: newUser.lastName,
+              email: newUser.email,
+              phone: newUser.phone,
+            },       
+          }
+      });
+    } catch (err){
+      return res.status(500).json({
+        "status": "Internal Server Error",
+        "message": "Registration unsuccessful",
+        "statusCode": 500
+      });
     }
-
 };
 
 
@@ -97,13 +63,12 @@ async function login (req, res, next) {
       const user = await prisma.user.findUnique({
         where: { email },
       });
-      console.log(user)
-      console.log(password, user.password)
+
       if (user && comparePassword((password), (user.password))) {
 
         const token = signToken({ id: user.userId}, JWT_SECRET, '1h');
 
-        res.status(200).json({
+        return res.status(200).json({
           status: 'success',
           message: 'Login successful',
           data: {
@@ -117,9 +82,9 @@ async function login (req, res, next) {
             },
           },
         });
-       console.log(user.email, 'login')
+
       }  else {
-        res.status(401).json({
+        return res.status(401).json({
         "status": "Bad request",
         "message": "Authentication failed",
         "statusCode": 401
@@ -127,7 +92,7 @@ async function login (req, res, next) {
       }
    
     } catch (error) {
-      next(error)
+      next(error);
     }
 }; 
 
