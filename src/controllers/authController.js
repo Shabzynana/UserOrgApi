@@ -81,8 +81,13 @@ async function register(req, res, next)  {
           })
         }
     } catch (error) {
-      next(error)
-      console.log('An error occurred:', error.message);
+      // next(error)
+      // console.log('An error occurred:', error.message);
+      res.status(400).json({
+        "status": "Bad request",
+        "message": "Registration unsuccessful",
+        "statusCode": 400
+      })
 
       // console.log(error, 'error')
     }
@@ -127,7 +132,12 @@ async function login (req, res, next) {
       }
    
     } catch (error) {
-      next(error)
+      // next(error)
+      res.status(401).json({
+        "status": "Bad request",
+        "message": "Authentication failed",
+        "statusCode": 401
+      })
     }
 }; 
 
