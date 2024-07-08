@@ -12,14 +12,6 @@ const path = require('path');
 
 const app = express();
 
-// app.set('view engine', 'ejs');
-// app.use(express.static(path.join(__dirname, 'public')));
-// app.set('views', path.join(__dirname, './src/templates'))
-
-// // Render login page
-// app.get('/login', (req, res) => {
-//     res.render('login');
-// });
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
