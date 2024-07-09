@@ -46,4 +46,4 @@ The following environment variables are required:
 - Express.js
 - Prisma
 
-## more information on usuage coming soon
+## more information on usage coming soon
