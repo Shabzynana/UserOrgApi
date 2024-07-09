@@ -18,7 +18,7 @@ async function getallOrg(req, res, next)  {
         status: 'success',
         message: 'Organisations retrieved successfully',
         data: {
-            'orrganisations': organisations
+            'organisations': organisations
         },
       });
     } catch (error) {
